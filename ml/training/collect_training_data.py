@@ -773,6 +773,11 @@ def parse_args() -> argparse.Namespace:
                         help="How many days back to collect (default: 180)")
     parser.add_argument("--resume", action="store_true",
                         help="Resume from per-sensor checkpoints if they exist")
+    parser.add_argument("--force", action="store_true",
+                        help="Override the disabled guard. This script hits the "
+                             "PurpleAir /history endpoint, the single biggest "
+                             "consumer of API points — only pass this if you "
+                             "intend to spend points rebuilding the training set.")
     return parser.parse_args()
 
 
@@ -824,6 +829,18 @@ def print_run_summary(final: pd.DataFrame, days: int) -> None:
 
 def main() -> None:
     args = parse_args()
+
+    # Disabled by default to protect the PurpleAir API key. The /history endpoint
+    # this script calls is the biggest point drain, and Phase 4 is not wired up,
+    # so an accidental run just burns points for nothing. Pass --force to run.
+    if not args.force:
+        log.error(
+            "collect_training_data.py is disabled. It hits PurpleAir /history "
+            "(the biggest API-point drain) and Phase 4 is not active. "
+            "Re-run with --force only if you actually intend to rebuild the "
+            "training set and spend points."
+        )
+        sys.exit(1)
 
     if not PURPLEAIR_API_KEY:
         log.error("PURPLEAIR_API_KEY not set in .env — cannot continue")
