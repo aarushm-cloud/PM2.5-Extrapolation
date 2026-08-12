@@ -12,12 +12,26 @@ Public air quality tools surface point-sensor readings or county-level averages.
 
 ## What it does
 
-- Pulls live PM₂.₅ readings from 27 PurpleAir sensors across the DFW metro and supplements them with OpenAQ reference monitors
+- Pulls live PM₂.₅ readings from ~30 PurpleAir sensors across the DFW metro (the count varies run to run) and supplements them with OpenAQ reference monitors
 - Applies EPA correction (AirNow Fire and Smoke Map formula) to raw PurpleAir readings using humidity
 - Interpolates a smooth 200×200 PM₂.₅ grid using IDW (Inverse Distance Weighting) with cosine-corrected distance calculations for Dallas latitude
 - Adjusts the interpolated grid using live TomTom traffic congestion (exponential curve weighting) and OpenWeatherMap wind direction (per-cell cosine similarity factor)
 - Renders a stylized 3D city dashboard with cell-level drill-down and a first-person street view, plus a Folium raster overlay map for local cross-comparison
 - Accumulates live snapshots for drift monitoring and downstream modeling
+
+---
+
+## Tech stack
+
+Python 3.10+ engine with a FastAPI service layer; React + React Three Fiber frontend bundled with Vite. A few distinctive choices:
+
+- **FastAPI** — typed JSON wrapper around the existing Python engine; same backend serves Streamlit and the React frontend with no logic duplication
+- **React Three Fiber** — declarative 3D scene graph for the city and street views
+- **Zustand** — minimal frontend state for sensors, grid, scene, and view selection
+- **OSMnx** — street graph extraction for the cleanest-path optimizer and highway-distance spatial features
+- **Meteostat** — historical NOAA ISD wind data for offline training without an API key
+
+Full dependency list in `requirements.txt` (Python) and `web/package.json` (frontend).
 
 ---
 
@@ -27,7 +41,7 @@ The custom frontend ([`web/`](web/)) is the primary interface and what's deploye
 
 **Two primary views.** A top-down isometric *city overview* of the DFW bounding box with a clickable cell grid, generated buildings, and PM₂.₅-driven particle ambience — hovering surfaces a cell info card; clicking selects the cell and updates the side panel. A first-person *street view* drops the user into ground level for any selected cell; the geometry is reusable, only the air-quality state changes.
 
-**Persistent left panel.** AQI category, current PM₂.₅ reading with 24h delta and attribution line ("EPA-corrected · IDW from N nearby sensors"), AQI-driven health guidance for sensitive groups and the general public, activity guidance (outdoor exercise, windows, masks), and a per-cell breakdown (traffic adjustment, wind adjustment, highway distance, last updated).
+**Persistent left panel.** AQI category and current PM₂.₅ with 24h delta and attribution ("EPA-corrected · IDW from N nearby sensors"), health and activity guidance keyed to the AQI level, and a per-cell breakdown (traffic, wind, highway distance, last updated).
 
 **Top status bar.** Live indicator with sensor count, network-median PM₂.₅ (robust to outlier sensors), wind speed and direction, and an "updated N min ago" timestamp.
 
@@ -39,7 +53,7 @@ The custom frontend ([`web/`](web/)) is the primary interface and what's deploye
 
 Bounding box: N 33.08 / S 32.55 / E -96.46 / W -97.05
 
-19 of 27 sensors pass A/B validation on a typical run. 7 of 16 macro grid cells are sparsely covered, clustered in southern and far-eastern DFW (CV=1.21) — these regions are flagged as low-confidence in the dashboard so residents and decision-makers know where the interpolation is well-grounded and where it isn't.
+Roughly two-thirds of live sensors pass A/B validation on a typical run. In a coverage analysis, 7 of 16 macro grid cells were sparsely covered, clustered in southern and far-eastern DFW (CV=1.21) — these regions are flagged as low-confidence in the dashboard so residents and decision-makers know where the interpolation is well-grounded and where it isn't.
 
 ---
 
@@ -66,7 +80,7 @@ All free tier. No credit card required.
 
 **Adjustments.** Post-IDW, each grid cell gets traffic and wind corrections applied. Traffic uses an exponential curve above a congestion threshold. Wind uses per-cell cosine similarity between the wind vector and the bearing from each sensor — downwind cells get pollution added, upwind cells get it reduced. Sensor readings themselves are never modified; adjustments only apply to interpolated grid cells where IDW has no road or wind context.
 
-**Aggregation.** The headline network statistic shown in the top status bar is the *median* across the 30×30 display cells, not the mean. Median is robust to outlier readings from broken or anomalous sensors and is the defensible statistic for sparse sensor networks with known data quality limitations.
+**Aggregation.** The headline network statistic in the top status bar is the *median* across the 30×30 display cells, not the mean — robust to outlier readings from broken or anomalous sensors (rationale under Design decisions).
 
 **Rendering.** The interpolated and adjusted grid is exposed as JSON via the FastAPI service. The 3D frontend consumes it directly. The Folium view Gaussian-smooths the same grid into a PNG raster (ImageOverlay) with a sparse 30×30 transparent rectangle grid for click popups subsampled from the full 200×200 grid.
 
@@ -82,13 +96,7 @@ All free tier. No credit card required.
 
 **Why FastAPI between the engine and the frontend.** The original Python engine wasn't built for browser consumption. FastAPI wraps the existing pipeline as typed JSON endpoints (`/sensors`, `/grid`, `/cells/{id}`) without modifying the underlying logic, which means the same engine serves both the Streamlit app and the React frontend with no code duplication.
 
-**Why median over mean for the headline statistic.** With a sparse sensor network (27 sensors across the DFW metro) and known data quality issues (8 of 27 sensors typically fail A/B validation; a smaller number return anomalous values that survive validation but still skew aggregates), median is robust to outliers in a way mean is not. A pure mean is sensitive to a single broken sensor; median requires a much larger fraction of the network to be wrong before it shifts.
-
----
-
-## See it live
-
-[dfw-airquality.vercel.app](https://dfw-airquality.vercel.app) — Vercel-hosted frontend, Render-hosted FastAPI backend, with a background scheduler keeping the cache warm.
+**Why median over mean for the headline statistic.** With a sparse sensor network (~30 sensors across the DFW metro, varying run to run) and known data quality issues (roughly a third typically fail A/B validation on a given run; a smaller number return anomalous values that survive validation but still skew aggregates), median is robust to outliers in a way mean is not. A pure mean is sensitive to a single broken sensor; median requires a much larger fraction of the network to be wrong before it shifts.
 
 ---
 
@@ -220,14 +228,4 @@ dfw-airquality/
 
 ---
 
-## Tech stack
-
-Python 3.10+ engine with a FastAPI service layer; React + React Three Fiber frontend bundled with Vite. A few distinctive choices:
-
-- **FastAPI** — typed JSON wrapper around the existing Python engine; same backend serves Streamlit and the React frontend with no logic duplication
-- **React Three Fiber** — declarative 3D scene graph for the city and street views
-- **Zustand** — minimal frontend state for sensors, grid, scene, and view selection
-- **OSMnx** — street graph extraction for the cleanest-path optimizer and highway-distance spatial features
-- **Meteostat** — historical NOAA ISD wind data for offline training without an API key
-
-Full dependency list in `requirements.txt` (Python) and `web/package.json` (frontend).
+Built by Aarush Madhireddy.
