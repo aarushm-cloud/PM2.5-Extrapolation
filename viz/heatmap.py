@@ -1,4 +1,4 @@
-# viz/heatmap.py — Folium map builder (Phase 1: sensor dots, Phase 2: IDW heatmap, Phase 3: adjusted PM2.5)
+# viz/heatmap.py — Folium map builder (sensor dots, IDW heatmap, adjusted PM2.5)
 
 from functools import lru_cache
 from io import BytesIO
@@ -279,9 +279,9 @@ def build_sensor_map(
 ) -> folium.Map:
     """
     Build a Folium map with:
-      - IDW heatmap overlay (Phase 2), using the pre-computed adjusted grid
+      - IDW heatmap overlay, using the pre-computed adjusted grid
       - Sensor coverage confidence overlay (gray veil over weak-coverage cells)
-      - Colored circle marker for each sensor (Phase 1)
+      - Colored circle marker for each sensor
       - AQI legend + overlay legend
 
     The caller (app.py) is responsible for running run_idw() and adjust_grid()
@@ -298,7 +298,7 @@ def build_sensor_map(
     _add_idw_overlay(m, lats, lons, grid_values, confidence_grid)
     _add_confidence_overlay(m, lats, lons, confidence_grid)
 
-    # --- Phase 1: sensor dot markers ---
+    # --- sensor dot markers ---
     sensor_group = folium.FeatureGroup(name="Sensor Readings", show=True)
 
     for _, row in df.iterrows():

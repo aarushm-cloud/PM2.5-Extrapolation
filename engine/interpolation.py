@@ -56,7 +56,7 @@ def run_idw(
     relying on the global-mean fallback.
     grid_resolution controls grid density (200 = 200x200 points over Dallas).
 
-    Changes vs Phase 3:
+    Refinements over naive IDW:
       - power is now IDW_POWER (3) from config, not hardcoded 2
       - longitude deltas are multiplied by LON_CORRECTION (cos 32.78°) before
         squaring so east-west distances aren't overstated by ~19%

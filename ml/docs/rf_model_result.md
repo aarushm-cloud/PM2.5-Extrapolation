@@ -1,7 +1,7 @@
-# Phase 4 — Result
+# Random Forest Model — Result
 
-**Status:** Phase 4 does not ship. The dashboard stays on raw IDW + the
-heuristic `adjust_grid` from [engine/interpolation.py](../engine/interpolation.py).
+**Status:** The RF model does not ship. The dashboard stays on raw IDW + the
+heuristic `adjust_grid` from [engine/interpolation.py](../../engine/interpolation.py).
 This document records what was tried, why it didn't work, and what would have
 to change before another ML attempt is worth running.
 
@@ -11,11 +11,11 @@ to change before another ML attempt is worth running.
 
 Two RF architectures were considered.
 
-### Attempt 1 — RF replacing IDW (initial Phase 4 wiring, reverted)
+### Attempt 1 — RF replacing IDW (initial wiring, reverted)
 
 A `RandomForestRegressor` was trained on
 `(lat, lon, dist_to_highway_m, humidity, wind_speed, wind_deg, local_hour_of_day, day_of_week, is_weekend, is_am_rush, is_pm_rush, traffic_index) → pm25`
-using [data/history.csv](history.csv) (~68k rows, 19 sensors, 179 days), and
+using [ml/data/history.csv](../data/history.csv) (~68k rows, 19 sensors, 179 days), and
 wired into the dashboard as a full replacement for IDW.
 
 Result on the live dashboard: every grid cell predicted ~7 µg/m³ regardless of
@@ -42,7 +42,7 @@ The follow-up idea: keep IDW as the spatial anchor (so live sensor readings
 drive predictions), and train the RF to predict the *residual*
 `pm25 - idw_loo_estimate` from the same feature set. Final prediction at
 inference would be `idw_estimate + rf_residual`. Code:
-[scripts/train_phase4_residual_rf.py](../scripts/train_phase4_residual_rf.py).
+[ml/research/train_residual_rf.py](../research/train_residual_rf.py).
 
 The script computes leave-one-out IDW per timestamp (vectorised, ~0.2 s
 across 4,320 timestamps), then runs leave-one-sensor-out CV comparing three
@@ -74,7 +74,7 @@ proxy reduces to "during rush hour, push every sensor up by
 `traffic_factor(traffic_index) * 8 µg/m³` regardless of location," which is
 bound to hurt sensors not near a road.
 
-The production heuristic in [engine/interpolation.py:adjust_grid](../engine/interpolation.py)
+The production heuristic in [engine/interpolation.py:adjust_grid](../../engine/interpolation.py)
 uses K-nearest TomTom road points + per-cell distance decay + per-cell wind
 direction relative to those roads. It almost certainly performs much better
 than 4.57 in practice — we just can't measure that without paid TomTom
@@ -102,8 +102,8 @@ to held-out sensors, and adds noise on average.
 ## Conclusion
 
 **With the current feature set and 19 sensors, IDW alone outperforms ML
-approaches.** Phase 4 is closed for now. No model is loaded at runtime;
-[scripts/train_phase4_residual_rf.py](../scripts/train_phase4_residual_rf.py)
+approaches.** The RF effort is closed for now. No model is loaded at runtime;
+[ml/research/train_residual_rf.py](../research/train_residual_rf.py)
 is preserved in the repo so the comparison is reproducible.
 
 ---
@@ -116,20 +116,20 @@ Forward-looking only. None of these are next.
   Rapid Refresh) provides ~3 km wind grids hourly over CONUS. Replacing the
   metro-mean wind scalar with a per-cell interpolated wind vector would give
   the RF actual spatial signal in the wind features. Wind history is required
-  to retrain, so [data/collect_training_data.py](collect_training_data.py)
+  to retrain, so [ml/training/collect_training_data.py](../training/collect_training_data.py)
   would need an HRRR backfill.
 - **Land-use features.** OpenStreetMap (via Overpass) road density,
   industrial-land-use proximity, building footprint density. These vary
   per cell and might help the RF learn local pollution patterns IDW can't
-  pick up from sparse sensor coverage. [data/spatial_features.py](spatial_features.py)
+  pick up from sparse sensor coverage. [data/spatial/spatial_features.py](../../data/spatial/spatial_features.py)
   is the right place to add them.
 - **More sensors.** 19 PurpleAir sensors over the DFW metro is sparse. With
   100+ sensors, the residuals after LOO IDW would have more spatial
   structure for the RF to learn.
 - **OpenAQ as reference-grade anchors.** Reference-grade monitors are
-  already pulled live in [data/openaq.py](openaq.py), but the historical
+  already pulled live in [data/ingestion/openaq.py](../../data/ingestion/openaq.py), but the historical
   pipeline only uses PurpleAir. Adding OpenAQ history to
-  [data/collect_training_data.py](collect_training_data.py) would give the
+  [ml/training/collect_training_data.py](../training/collect_training_data.py) would give the
   training set a calibration backbone independent of PurpleAir's correction
   formula.
 
@@ -137,13 +137,13 @@ Forward-looking only. None of these are next.
 
 ## Audit-trail infrastructure stays
 
-Independent of the Phase 4 outcome, the training data pipeline is kept:
+Independent of the RF outcome, the training data pipeline is kept:
 
-- [data/history.csv](history.csv) — 6-month PurpleAir history with
+- [ml/data/history.csv](../data/history.csv) — 6-month PurpleAir history with
   EPA correction, NOAA wind, spatial features.
-- [data/collect_training_data.py](collect_training_data.py) — canonical
+- [ml/training/collect_training_data.py](../training/collect_training_data.py) — canonical
   one-shot training-data builder.
-- [data/spatial_features.py](spatial_features.py) — distance-to-highway
+- [data/spatial/spatial_features.py](../../data/spatial/spatial_features.py) — distance-to-highway
   and other static spatial features per coordinate. Used by the training
   pipeline.
 

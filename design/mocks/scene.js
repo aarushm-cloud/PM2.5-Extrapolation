@@ -1046,7 +1046,7 @@ $('#btn-pin').addEventListener('click', ()=>{
 $('#route-btn').addEventListener('click', ()=>{
   const meta = $('#route-btn').querySelector('.meta');
   const orig = meta.textContent;
-  meta.textContent = 'coming in phase 5';
+  meta.textContent = 'coming soon';
   setTimeout(()=>{ meta.textContent = orig; }, 1800);
 });
 

@@ -1,6 +1,6 @@
 # engine/features.py — Feature engineering: compute per-sensor traffic and wind columns
 #
-# TODO (Phase 4 inference): the Random Forest also trains on
+# TODO (RF inference): the Random Forest also trains on
 # `dist_to_highway_m` from `data/spatial/spatial_features.compute_distance_to_highway`.
 # Grid cells passed into the model at inference time will need the same
 # lookup applied per cell. Add it here (or wherever the live feature pipeline
@@ -14,7 +14,7 @@
 # Instead, this function computes traffic and wind values PER SENSOR and stores them
 # as separate columns. These columns are used for:
 #   1. Live dashboard snapshots — stored in data/dashboard_snapshots.csv via
-#      data/ingestion/history.py:save_snapshot. (NOT the Phase 4 training set; that
+#      data/ingestion/history.py:save_snapshot. (NOT the RF training set; that
 #      is built separately by ml/training/collect_training_data.py from historical
 #      PurpleAir data.)
 #   2. The same adjustment logic is applied POST-IDW to grid cells in interpolation.py,

@@ -156,7 +156,7 @@ def fetch_sensors() -> tuple[pd.DataFrame, pd.DataFrame]:
     df = apply_epa_correction(df)
 
     # Keep only the columns we need and tag the source. humidity is preserved
-    # as a model input for Phase 4 RF inference.
+    # as a model input for RF inference.
     keep = ["sensor_id", "name", "lat", "lon", "pm25", "pm25_raw", "epa_corrected"]
     if "humidity" in df.columns:
         keep.append("humidity")

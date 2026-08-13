@@ -224,7 +224,7 @@ dfw-airquality/
 
 - **Cleanest-path route optimizer** — graph routing on the OSM street network, with edge weights combining distance and PM₂.₅ exposure. Backend (`engine/router.py`) is scaffolded; UI integration pending.
 - **Historical playback** — time-machine view over the accumulated `dashboard_snapshots.csv`, scrubbing through past PM₂.₅ states.
-- **Random Forest residual model in inference** — *evaluated, baseline outperformed, shelved.* The 180-day RF pipeline didn't beat deterministic IDW + adjustments on RMSE (see [`ml/docs/PHASE4_RESULT.md`](ml/docs/PHASE4_RESULT.md) for the full negative-result writeup). Training infrastructure and the OSMnx-backed spatial feature pipeline are retained, but the live dashboard runs on IDW.
+- **Random Forest residual model in inference** — *evaluated, baseline outperformed, shelved.* The 180-day RF pipeline didn't beat deterministic IDW + adjustments on RMSE (see [`ml/docs/rf_model_result.md`](ml/docs/rf_model_result.md) for the full negative-result writeup). Training infrastructure and the OSMnx-backed spatial feature pipeline are retained, but the live dashboard runs on IDW.
 
 ---
 

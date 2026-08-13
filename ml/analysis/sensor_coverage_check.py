@@ -351,7 +351,7 @@ def main() -> None:
     if cv > CV_CLUSTER_BAR or len(empty) >= 4 or not outliers.empty:
         recommendation = (
             "Reconsider before training. Coverage gaps will cause the IDW "
-            "(and the Phase 4 model) to extrapolate heavily in empty regions. "
+            "(and the RF model) to extrapolate heavily in empty regions. "
             "Either accept that the model is unreliable in those areas, "
             "supplement with OpenAQ reference monitors there, or weight "
             "training rows by spatial density."

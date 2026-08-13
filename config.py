@@ -76,7 +76,7 @@ IDW_SEARCH_RADIUS_DEG = 0.15
 # the busiest highways. 20 was too aggressive and created artificial hotspots.
 TRAFFIC_WEIGHT = 8.0
 
-# --- Phase 5 route comparator ---
+# --- route comparator ---
 # Per-edge cleanest-route weight is `length × (pm_midpoint + ROUTE_PM_ALPHA)`.
 # Small α (≈0.1) → PM dominates → cleanest aggressively detours.
 # Large α (≈10) → length dominates → cleanest collapses to shortest.

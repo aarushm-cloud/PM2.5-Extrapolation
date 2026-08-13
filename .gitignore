@@ -9,6 +9,7 @@ requests_cache.sqlite
 CLAUDE.md
 project_context.txt
 ml/data/history.csv
+ml/data/collection_log.txt
 ml/models/*.pkl
 UI_SUMMARY.md
 *.bak

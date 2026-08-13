@@ -18,7 +18,7 @@ A longer companion report exists at [ml/docs/DFW_Algorithm_Report.md](ml/docs/DF
 6. [Final grid adjustment equation (deep)](#6-final-grid-adjustment-equation-deep)
 7. [Why post-IDW only? (deep)](#7-why-post-idw-only-deep)
 8. [Rendering pipeline (brief)](#8-rendering-pipeline-brief)
-9. [Phase 4 spatial feature (brief)](#9-phase-4-spatial-feature-brief)
+9. [Spatial feature (brief)](#9-spatial-feature-brief)
 10. [Parameter summary table](#10-parameter-summary-table)
 
 ---
@@ -453,7 +453,7 @@ Each subsampled cell becomes an invisible `folium.Rectangle` (`fill_opacity = 0.
 
 ---
 
-## 9. Phase 4 spatial feature (brief)
+## 9. Spatial feature (brief)
 
 [data/spatial/spatial_features.py:104-116](data/spatial/spatial_features.py#L104-L116)
 
@@ -466,11 +466,11 @@ def compute_distance_to_highway(lat, lon) -> float:
     return geodesic((lat, lon), (on_line.y, on_line.x)).meters  # geodesic refinement
 ```
 
-`dist_to_highway_m` is the spatial feature that bridges the live and historical pipelines. The Phase 4 Random Forest needs features that can be computed identically at training time (per sensor, from history) and at inference time (per grid cell, live). Because TomTom's free tier has no historical traffic, we can't reconstruct historical congestion — but distance to the nearest interstate or US highway is a property of *location alone*, no time component, so the same function works for both.
+`dist_to_highway_m` is the spatial feature that bridges the live and historical pipelines. The Random Forest needs features that can be computed identically at training time (per sensor, from history) and at inference time (per grid cell, live). Because TomTom's free tier has no historical traffic, we can't reconstruct historical congestion — but distance to the nearest interstate or US highway is a property of *location alone*, no time component, so the same function works for both.
 
 Highways are pulled from OpenStreetMap via OSMnx with the filter `["highway"~"motorway|motorway_link|trunk|trunk_link"]`, cached on disk for 30 days, and held in a module-level `_HIGHWAYS` list to load once per process. The lookup picks the nearest LineString by cheap planar distance (good enough for *ranking*) and then computes geodesic distance to the actual nearest point on that line for the precise value.
 
-This feature is computed by the training pipeline today but is not yet wired into a live model — the TODO in [engine/features.py:3-8](engine/features.py#L3-L8) tracks the inference-time integration that has to happen before Phase 4 RF inference is turned on.
+This feature is computed by the training pipeline today but is not yet wired into a live model — the TODO in [engine/features.py:3-8](engine/features.py#L3-L8) tracks the inference-time integration that has to happen before RF inference is turned on.
 
 ---
 

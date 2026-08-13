@@ -1,8 +1,8 @@
-# DFW Air Quality Dashboard — Complete Algorithm Report
+# DFW Air Quality Dashboard — Algorithm Report
 
 **Author:** Aarush Madhireddy
 **Date:** May 12, 2026
-**Project:** DFW Real-Time Air Quality Dashboard (Phase 3)
+**Project:** DFW Real-Time Air Quality Dashboard
 
 ---
 
@@ -102,7 +102,7 @@ This formula is documented in the EPA's AirNow Fire and Smoke Map technical docu
 
 **Calibration note.** `TRAFFIC_WEIGHT` (8.0 µg/m³), `WIND_WEIGHT` (10.0 µg/m³), and the classification breakpoints were all chosen against *reference-grade* PM2.5 levels reported in the literature, not PurpleAir-raw readings. Applying the EPA correction at the source aligns the live pipeline with those parameters without any recalibration.
 
-**Training-pipeline parity.** The Phase 4 training-data builder (`ml/training/collect_training_data.py`) applies the same EPA PM2.5 correction formula
+**Training-pipeline parity.** The training-data builder (`ml/training/collect_training_data.py`) applies the same EPA PM2.5 correction formula
 
 > `PM2.5_corrected = 0.52 * PM2.5_raw - 0.085 * RH + 5.71`
 

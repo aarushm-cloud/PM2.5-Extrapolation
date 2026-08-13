@@ -1,7 +1,7 @@
 # AERIA Backend
 
 FastAPI service that wraps the existing DFW air quality pipeline as a JSON API
-for the AERIA frontend (Phase 6 UI overhaul). The legacy Streamlit app at
+for the AERIA frontend. The legacy Streamlit app at
 `app.py` keeps running unchanged — this backend only re-exposes `engine/`,
 `data/`, and `config.py` as HTTP endpoints.
 

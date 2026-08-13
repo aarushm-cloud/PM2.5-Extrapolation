@@ -1,9 +1,9 @@
 """
 review_180day_run.py
 
-One-off go/no-go review of the 180-day Phase 4 training-data run.
+One-off go/no-go review of the 180-day training-data run.
 Reads ml/data/quality_report.json + ml/data/history.csv, runs the checks
-defined in PHASE4_HANDOFF.md, prints PASS / WARN / FAIL per check,
+for the training-data run, prints PASS / WARN / FAIL per check,
 and ends with a single recommendation block.
 """
 

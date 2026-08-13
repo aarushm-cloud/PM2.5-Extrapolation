@@ -3,7 +3,7 @@ scripts/collector.py — Headless live snapshot collector.
 
 Runs independently of the Streamlit app. Fetches all live data sources on a
 configurable interval and appends snapshots to data/dashboard_snapshots.csv.
-This is NOT the Phase 4 training-data pipeline; that is handled by
+This is NOT the RF training-data pipeline; that is handled by
 ml/training/collect_training_data.py from PurpleAir's historical API.
 
 Usage:

@@ -22,7 +22,7 @@ router = APIRouter()
 
 # Cache window for the assembled pipeline snapshot.
 #
-# Bumped from 300s to 1800s as part of the Phase 5 caching pass: at
+# Widened to a 1800s TTL to bound TomTom usage: at
 # SAMPLE_GRID=5 (25 TomTom calls per refresh) and a 30-min TTL, daily
 # usage caps at 48 × 25 = 1,200 calls — half of TomTom's 2,500/day shared
 # free-tier limit, regardless of frontend traffic.

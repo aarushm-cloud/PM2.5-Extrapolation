@@ -5,7 +5,7 @@
 """
 Static spatial features derived from OpenStreetMap geometry.
 
-The Phase 4 training pipeline needs spatial signals that can be computed
+The RF training pipeline needs spatial signals that can be computed
 identically at inference time for IDW grid cells. Distance-to-nearest-highway
 fits: it's a property of location alone (no time component, no API), so the
 same lookup works for historical sensor rows AND live grid cells.

@@ -11,7 +11,7 @@ cache_warm doesn't deadlock on cold boot.
 
 Optional startup flags:
   AERIA_PRELOAD_GRAPH=1  — pre-load the OSM walking graph in a daemon
-                            thread (item 2 of Phase 5; first /api/route
+                            thread (first /api/route
                             otherwise pays the cold-load cost).
 """
 

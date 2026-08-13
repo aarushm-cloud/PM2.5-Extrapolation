@@ -1,16 +1,16 @@
-# DEPRECATED: Phase 4 RF model was evaluated and shelved.
+# DEPRECATED: the RF model was evaluated and shelved.
 # The dashboard runs on IDW + adjust_grid; this module is dormant.
-# See ml/docs/PHASE4_RESULT.md for the full negative-result writeup.
+# See ml/docs/rf_model_result.md for the full negative-result writeup.
 #
-# ml/predictor.py — Phase 4 Random Forest inference for grid cells.
+# ml/predictor.py — Random Forest inference for grid cells.
 #
-# Loads models/rf_phase4.pkl once per process and predicts PM2.5 at every cell
+# Loads models/rf.pkl once per process and predicts PM2.5 at every cell
 # of the dashboard grid. Replaces the IDW + post-IDW adjustment path because
 # the RF was trained with lat/lon plus the same temporal traffic proxies and
 # spatial highway-distance feature, so it carries the spatial structure IDW
 # used to provide.
 #
-# Feature order MUST match models/rf_phase4_metadata.json:feature_names
+# Feature order MUST match models/rf_metadata.json:feature_names
 # exactly. Mismatches cause silent prediction garbage, so this module asserts
 # parity at startup against a freshly-built dummy feature row.
 
@@ -36,8 +36,8 @@ if str(ROOT) not in _sys.path:
 
 from config import DFW_AIRPORT_LAT_LON  # noqa: E402
 
-MODEL_PATH = ROOT / "ml" / "models" / "rf_phase4.pkl"
-METADATA_PATH = ROOT / "ml" / "models" / "rf_phase4_metadata.json"
+MODEL_PATH = ROOT / "ml" / "models" / "rf.pkl"
+METADATA_PATH = ROOT / "ml" / "models" / "rf_metadata.json"
 
 PM25_MIN_PLAUSIBLE = 0.0
 PM25_MAX_PLAUSIBLE = 500.0
@@ -61,7 +61,7 @@ def load_model() -> tuple[object, dict]:
     if not MODEL_PATH.exists():
         raise FileNotFoundError(
             f"RF model not found at {MODEL_PATH}. "
-            f"Run ml/research/train_phase4_rf.py to build it."
+            f"Run ml/research/train_rf.py to build it."
         )
     if not METADATA_PATH.exists():
         raise FileNotFoundError(
@@ -170,7 +170,7 @@ def _assert_schema_parity() -> None:
     if actual != expected:
         raise RuntimeError(
             "FEATURE SCHEMA MISMATCH between live inference and trained model.\n"
-            f"  Expected (rf_phase4_metadata.json): {expected}\n"
+            f"  Expected (rf_metadata.json): {expected}\n"
             f"  Got (ml/predictor.build_features): {actual}\n"
             "  Train/inference drift detected — fix ml/predictor.py before "
             "deploying."

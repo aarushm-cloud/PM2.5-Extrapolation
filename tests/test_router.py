@@ -1,4 +1,4 @@
-"""Tests for engine.router — Phase 5 walking-route comparator.
+"""Tests for engine.router — walking-route comparator.
 
 All network calls (LocationIQ, OSMnx) are mocked. Routing tests use a
 tiny hand-built MultiDiGraph and a 5×5 PipelineSnapshot built inline so

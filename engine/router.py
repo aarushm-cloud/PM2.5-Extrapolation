@@ -1,4 +1,4 @@
-# engine/router.py — Phase 5 walking-route comparator.
+# engine/router.py — walking-route comparator.
 #
 # Two-route comparator over an OSMnx walking graph:
 #   shortest:  Dijkstra on edge length only.
@@ -8,7 +8,7 @@
 #
 # Public surface:
 #   - find_routes(start, end, grid=None, alpha=None) -> RouteComparison
-#   - preload_graph()  — for the FastAPI lifespan hook (item 2 of Phase 5).
+#   - preload_graph()  — for the FastAPI lifespan hook.
 #   - GeocodeFailure / OutOfDFWError / DisconnectedRouteError — narrow
 #     exception types so the api layer can map each to a distinct status.
 #
@@ -265,7 +265,7 @@ def get_walking_graph():
 
 def preload_graph() -> None:
     """Force the walking graph to load. Exposed for the FastAPI lifespan
-    hook (item 2 of Phase 5) — calling this at startup means the first
+    hook — calling this at startup means the first
     user request doesn't pay the cold-load cost.
     """
     get_walking_graph()

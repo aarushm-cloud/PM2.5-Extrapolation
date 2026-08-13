@@ -4,7 +4,7 @@
 # data/dashboard_snapshots.csv. These are live-pipeline snapshots taken while
 # the Streamlit app or scripts/collector.py is running.
 #
-# Phase 4 training data is NOT collected here. The canonical training set is
+# RF training data is NOT collected here. The canonical training set is
 # ml/data/history.csv, built by ml/training/collect_training_data.py from
 # PurpleAir's historical API. Live snapshots and the training set live in
 # separate files on purpose, so the training script can overwrite history.csv

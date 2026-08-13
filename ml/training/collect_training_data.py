@@ -1,11 +1,11 @@
 """
-DEPRECATED: Phase 4 RF model was evaluated and shelved.
+DEPRECATED: the RF model was evaluated and shelved.
 The dashboard runs on IDW + adjust_grid; this module is dormant.
-See ml/docs/PHASE4_RESULT.md for the full negative-result writeup.
+See ml/docs/rf_model_result.md for the full negative-result writeup.
 
 collect_training_data.py
 
-Builds ml/data/history.csv — the training dataset for the Phase 4 Random Forest
+Builds ml/data/history.csv — the training dataset for the Random Forest
 PM2.5 interpolation model for the DFW Air Quality Dashboard.
 
 Data sources (all free, all auditable):
@@ -767,7 +767,7 @@ def build_final_dataset(pa_df: pd.DataFrame, wind_df: pd.DataFrame) -> pd.DataFr
 def parse_args() -> argparse.Namespace:
     """Parse CLI arguments."""
     parser = argparse.ArgumentParser(
-        description="Build history.csv for DFW Air Quality Dashboard Phase 4 model."
+        description="Build history.csv for the DFW Air Quality Dashboard RF model."
     )
     parser.add_argument("--days", type=int, default=180,
                         help="How many days back to collect (default: 180)")
@@ -831,12 +831,12 @@ def main() -> None:
     args = parse_args()
 
     # Disabled by default to protect the PurpleAir API key. The /history endpoint
-    # this script calls is the biggest point drain, and Phase 4 is not wired up,
+    # this script calls is the biggest point drain, and the RF model is not wired up,
     # so an accidental run just burns points for nothing. Pass --force to run.
     if not args.force:
         log.error(
             "collect_training_data.py is disabled. It hits PurpleAir /history "
-            "(the biggest API-point drain) and Phase 4 is not active. "
+            "(the biggest API-point drain) and the RF model is not active. "
             "Re-run with --force only if you actually intend to rebuild the "
             "training set and spend points."
         )

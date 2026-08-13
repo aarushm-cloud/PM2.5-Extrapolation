@@ -1,6 +1,6 @@
 # AERIA Design Notes
 
-Design direction for the DFW Air Quality Dashboard UI overhaul (Phase 6).
+Design direction for the DFW Air Quality Dashboard UI overhaul.
 
 This document defines what is **locked** (decided, do not relitigate) and what is **open** (intentional flexibility for Claude Code during implementation). It exists so any future implementation session has a single source of truth for design intent.
 
@@ -31,7 +31,7 @@ These decisions are final. They were validated across multiple iteration rounds 
 - **City overview** (default)
 - **Street view** (active when dropped into a cell)
 - **Time machine** (future — historical playback)
-- **Route lab** (future — Phase 5 cleanest-path optimizer)
+- **Route lab** (future — cleanest-path optimizer)
 
 ### Top status bar (right-aligned)
 
@@ -68,7 +68,7 @@ Search box near the top of the city overview. Typing a zip pans the camera to th
 
 ### Find a route button
 
-Lower-right of the city overview. Placeholder until Phase 5. Label: "Find a route · Cleanest path · Soon"
+Lower-right of the city overview. Placeholder for now. Label: "Find a route · Cleanest path · Soon"
 
 ### Bottom timeline scrubber
 
@@ -191,7 +191,7 @@ The production build is sequenced across roughly six Claude Code sessions:
 5. Left panel — health guidance, cell breakdown, navigation chrome
 6. Street drop-in view — first-person scene with particles
 
-Phase 5 (route optimizer) lands cleanly into the finished UI as a later increment.
+The route optimizer lands cleanly into the finished UI as a later increment.
 
 ---
 

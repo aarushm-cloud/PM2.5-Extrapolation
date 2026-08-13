@@ -1,4 +1,4 @@
-"""Tests for POST /api/route — Phase 5 item 2.
+"""Tests for POST /api/route.
 
 Both engine.router.find_routes and api.routes.grid.get_cached_snapshot
 are mocked at api.routes.route's import sites so these tests don't need
@@ -177,7 +177,7 @@ def test_post_route_wrong_field_types_return_422():
 
 
 # ---------------------------------------------------------------------------
-# Endpoint-layer route cache (Phase 5 item 4)
+# Endpoint-layer route cache
 # ---------------------------------------------------------------------------
 
 @pytest.fixture

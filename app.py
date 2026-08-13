@@ -1,4 +1,4 @@
-# app.py — Streamlit entry point (Phase 1 + 2 + 3)
+# app.py — Streamlit entry point
 
 import pandas as pd
 import streamlit as st
