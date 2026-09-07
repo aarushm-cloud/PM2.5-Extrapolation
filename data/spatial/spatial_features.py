@@ -1,7 +1,6 @@
-# Highway-distance source: OSMnx (live OSM pull, cached on disk).
-# Chosen over the static-GeoJSON fallback because the install succeeded
-# cleanly. To widen the highway set, change HIGHWAY_FILTER below — the
-# next run will refetch and recache automatically.
+# Highway-distance source: a committed geometry bundle, with OSMnx (live
+# OSM pull, cached on disk) as the refresh path. To widen the highway set,
+# change HIGHWAY_FILTER below and rerun scripts/build_highway_bundle.py.
 """
 Static spatial features derived from OpenStreetMap geometry.
 
@@ -13,6 +12,8 @@ same lookup works for historical sensor rows AND live grid cells.
 
 from __future__ import annotations
 
+import gzip
+import json
 import logging
 import pickle
 import time
@@ -35,6 +36,12 @@ DFW_BBOX = {
 
 CACHE_DIR  = Path("data/.cache")
 CACHE_FILE = CACHE_DIR / "dfw_highways.pkl"
+
+# Committed highway geometry. `data/.cache/` is gitignored, so a fresh
+# deploy has no disk cache and would otherwise hit Overpass live — which
+# refuses connections from datacenter IPs, taking the grid pipeline down.
+# Regenerate with scripts/build_highway_bundle.py.
+BUNDLE_FILE = Path(__file__).resolve().parent / "dfw_highways.json.gz"
 CACHE_TTL_SECONDS = 30 * 24 * 3600  # 30 days
 
 # OSM tag filter — interstates and US highways in the DFW area
@@ -80,13 +87,29 @@ def _fetch_and_cache_highways() -> list[LineString]:
     return geoms
 
 
+def _load_bundled_highways() -> list[LineString]:
+    """Load the committed highway bundle. No network, no OSMnx import."""
+    with gzip.open(BUNDLE_FILE, "rt", encoding="utf-8") as f:
+        return [LineString(coords) for coords in json.load(f)]
+
+
 def _load_highways() -> list[LineString]:
-    """Return cached highway LineStrings, refetching if cache is missing or stale."""
+    """Return highway LineStrings, preferring the freshest source available:
+    disk cache, then a refetch, then the committed bundle. Overpass is never
+    allowed to be the difference between a working and a broken pipeline."""
     if CACHE_FILE.exists():
         age = time.time() - CACHE_FILE.stat().st_mtime
         if age < CACHE_TTL_SECONDS:
             with CACHE_FILE.open("rb") as f:
                 return pickle.load(f)
+        try:
+            return _fetch_and_cache_highways()
+        except Exception as e:
+            log.warning("Highway refetch failed (%s) — using bundled geometry", e)
+            return _load_bundled_highways()
+
+    if BUNDLE_FILE.exists():
+        return _load_bundled_highways()
     return _fetch_and_cache_highways()
 
 

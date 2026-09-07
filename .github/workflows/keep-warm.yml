@@ -1,11 +1,14 @@
 name: keep-warm
 
-# Render free tier spins the API down after 15 min with no inbound traffic,
-# and a cold start takes ~60s. Pinging well inside that window keeps every
-# request warm; the retry loop absorbs a cold start instead of failing on it.
+# Recovery net, not the primary keep-warm — cron-job.org handles that.
+# Its 30s timeout can't outlast a ~60s Render cold start, so if the service
+# ever does go down it fails every ping and disables itself after 25. This
+# job's 90s timeout revives the container so those pings succeed again.
+# Twice hourly at off-peak minutes: GitHub drops queued schedule events
+# under load (worst at :00), so a */5 cadence never actually fired.
 on:
   schedule:
-    - cron: '*/5 0-4,12-23 * * *'  # ~7am-11pm CT, keeps monthly hours under Render's 750 cap
+    - cron: '7,37 0-4,12-23 * * *'  # ~7am-11pm CT, off the hour boundary
   workflow_dispatch:
 
 jobs:
