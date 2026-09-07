@@ -1,0 +1,29 @@
+name: keep-warm
+
+# Render free tier spins the API down after 15 min with no inbound traffic,
+# and a cold start takes ~60s. Pinging well inside that window keeps every
+# request warm; the retry loop absorbs a cold start instead of failing on it.
+on:
+  schedule:
+    - cron: '*/5 0-4,12-23 * * *'  # ~7am-11pm CT, keeps monthly hours under Render's 750 cap
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping health endpoint
+        env:
+          URL: https://aeria-api.onrender.com/api/health
+        run: |
+          for attempt in 1 2 3 4 5; do
+            code=$(curl -s -o /tmp/body -w '%{http_code}' --max-time 90 "$URL" || echo 000)
+            if [ "$code" = "200" ]; then
+              echo "attempt $attempt: 200 $(cat /tmp/body)"
+              exit 0
+            fi
+            echo "attempt $attempt: http=$code (cold start or spin-up), retrying"
+            sleep 30
+          done
+          echo "service did not respond after 5 attempts"
+          exit 1
